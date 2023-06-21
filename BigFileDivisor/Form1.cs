@@ -26,83 +26,83 @@ namespace BigFileDivisor
         {
             if (openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                string arquivoOrigem = openFileDialog1.FileName;
-                int linhasPorArquivo = int.Parse(textBox1.Text);
+                string originalArchive = openFileDialog1.FileName;
+                int rowsByArchive = int.Parse(textBox1.Text);
 
-                if (Path.GetExtension(arquivoOrigem) == ".xlsx")
+                if (Path.GetExtension(originalArchive) == ".xlsx")
                 {
-                    SepararArquivoExcel(arquivoOrigem, linhasPorArquivo);
+                    SplitExcel(originalArchive, rowsByArchive);
                 }
-                else if (Path.GetExtension(arquivoOrigem) == ".txt")
+                else if (Path.GetExtension(originalArchive) == ".txt")
                 {
-                    SepararArquivoTexto(arquivoOrigem, linhasPorArquivo);
+                    SplitTxt(originalArchive, rowsByArchive);
                 }
-                else if (Path.GetExtension(arquivoOrigem) == ".docx")
+                else if (Path.GetExtension(originalArchive) == ".docx")
                 {
-                    SepararArquivoDocx(arquivoOrigem, linhasPorArquivo);
+                    SplitDocx(originalArchive, rowsByArchive);
                 }
                 else
                 {
-                    MessageBox.Show("Formato de arquivo não suportado. Por favor, selecione um arquivo .xlsx, .txt ou .docx.");
+                    MessageBox.Show("Unsupported file. Please, select a .xlsx, .txt or .docx. File");
                 }
             }
         }
 
-        private void SepararArquivoExcel(string arquivoOrigem, int linhasPorArquivo)
+        private void SplitExcel(string originalArchive, int rowsByArchive)
         {
-            using (var workbook = new XLWorkbook(arquivoOrigem))
+            using (var workbook = new XLWorkbook(originalArchive))
             {
                 var worksheet = workbook.Worksheet(1);
                 var range = worksheet.RangeUsed();
 
-                int totalLinhas = range.RowCount();
-                int totalArquivos = (int)Math.Ceiling((double)totalLinhas / linhasPorArquivo);
+                int totalRows = range.RowCount();
+                int totalArchives = (int)Math.Ceiling((double)totalRows / rowsByArchive);
 
-                for (int i = 0; i < totalArquivos; i++)
+                for (int i = 0; i < totalArchives; i++)
                 {
-                    string nomeArquivo = $"arquivo_{i + 1}.xlsx";
+                    string archiveName = $"archive_{i + 1}.xlsx";
 
                     using (var newWorkbook = new XLWorkbook())
                     {
                         var newWorksheet = newWorkbook.Worksheets.Add("Sheet1");
 
-                        int inicio = i * linhasPorArquivo + 1;
-                        int fim = Math.Min(inicio + linhasPorArquivo - 1, totalLinhas);
+                        int begin = i * rowsByArchive + 1;
+                        int end = Math.Min(begin + rowsByArchive - 1, totalRows);
 
-                        var rangeCopy = range.Range(inicio, 1, fim, range.ColumnCount());
+                        var rangeCopy = range.Range(begin, 1, end, range.ColumnCount());
                         rangeCopy.CopyTo(newWorksheet.Cell(1, 1));
 
-                        newWorkbook.SaveAs(nomeArquivo);
+                        newWorkbook.SaveAs(archiveName);
                     }
                 }
 
-                MessageBox.Show($"{totalArquivos} arquivos Excel foram gerados.");
+                MessageBox.Show($"{totalArchives} XSLX archives was created.");
             }
         }
 
-        private void SepararArquivoTexto(string arquivoOrigem, int linhasPorArquivo)
+        private void SplitTxt(string originalArchive, int rowsByArchive)
         {
-            string[] linhas = File.ReadAllLines(arquivoOrigem);
-            int totalLinhas = linhas.Length;
-            int totalArquivos = (int)Math.Ceiling((double)totalLinhas / linhasPorArquivo);
+            string[] rows = File.ReadAllLines(originalArchive);
+            int totalRows = rows.Length;
+            int totalArchives = (int)Math.Ceiling((double)totalRows / rowsByArchive);
 
-            for (int i = 0; i < totalArquivos; i++)
+            for (int i = 0; i < totalArchives; i++)
             {
-                string nomeArquivo = $"arquivo_{i + 1}.txt";
+                string archiveName = $"archive_{i + 1}.txt";
 
-                int inicio = i * linhasPorArquivo;
-                int fim = Math.Min(inicio + linhasPorArquivo, totalLinhas);
+                int begin = i * rowsByArchive;
+                int end = Math.Min(begin + rowsByArchive, totalRows);
 
-                string[] linhasSelecionadas = new string[fim - inicio];
-                Array.Copy(linhas, inicio, linhasSelecionadas, 0, fim - inicio);
+                string[] selectedRows = new string[end - begin];
+                Array.Copy(rows, begin, selectedRows, 0, end - begin);
 
-                File.WriteAllLines(nomeArquivo, linhasSelecionadas);
+                File.WriteAllLines(archiveName, selectedRows);
             }
 
-            MessageBox.Show($"{totalArquivos} arquivos de texto foram gerados.");
+            MessageBox.Show($"{totalArchives} TXT archives was created.");
         }
 
-        private void SepararArquivoDocx(string arquivoOrigem, int linhasPorArquivo)
+        private void SplitDocx(string originalArchive, int rowsByArchive)
         {
             textBox1.Click += (sender, e) =>
             {
@@ -110,23 +110,23 @@ namespace BigFileDivisor
                 textBox1.ForeColor = System.Drawing.SystemColors.WindowText;
             };
 
-            using (var document = DocX.Load(arquivoOrigem))
+            using (var document = DocX.Load(originalArchive))
             {
                 var paragraphs = document.Paragraphs;
 
-                int totalParagrafos = paragraphs.Count;
-                int totalArquivos = (int)Math.Ceiling((double)totalParagrafos / linhasPorArquivo);
+                int totalParagraphs = paragraphs.Count;
+                int totalArchives = (int)Math.Ceiling((double)totalParagraphs / rowsByArchive);
 
-                for (int i = 0; i < totalArquivos; i++)
+                for (int i = 0; i < totalArchives; i++)
                 {
-                    string nomeArquivo = $"arquivo_{i + 1}.docx";
+                    string archiveName = $"archive_{i + 1}.docx";
 
-                    using (var newDocument = DocX.Create(nomeArquivo))
+                    using (var newDocument = DocX.Create(archiveName))
                     {
-                        int inicio = i * linhasPorArquivo;
-                        int fim = Math.Min(inicio + linhasPorArquivo, totalParagrafos);
+                        int begin = i * rowsByArchive;
+                        int end = Math.Min(begin + rowsByArchive, totalParagraphs);
 
-                        for (int j = inicio; j < fim; j++)
+                        for (int j = begin; j < end; j++)
                         {
                             var paragraph = paragraphs[j];
                             newDocument.InsertParagraph(paragraph);
@@ -136,7 +136,7 @@ namespace BigFileDivisor
                     }
                 }
 
-                MessageBox.Show($"{totalArquivos} arquivos DOCX foram gerados.");
+                MessageBox.Show($"{totalArchives} DOCX archives was created.");
             }
         }
     }
