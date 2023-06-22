@@ -46,6 +46,7 @@
             // 
             // textBox1
             // 
+            this.textBox1.Cursor = System.Windows.Forms.Cursors.WaitCursor;
             this.textBox1.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.textBox1.Location = new System.Drawing.Point(250, 248);
             this.textBox1.Name = "textBox1";
@@ -54,7 +55,10 @@
             this.textBox1.Text = "numb. of rows";
             this.textBox1.TextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             this.textBox1.UseWaitCursor = true;
-            this.textBox1.MouseEnter += new System.EventHandler(this.textBox1_TextChanged);
+            this.textBox1.MouseDown += new System.Windows.Forms.MouseEventHandler(this.TextBox1_MouseDown);
+            this.textBox1.MouseEnter += new System.EventHandler(this.TextBox1_MouseEnter);
+            this.textBox1.MouseHover += new System.EventHandler(this.TextBox1_TextChanged);
+            this.textBox1.MouseUp += new System.Windows.Forms.MouseEventHandler(this.textBox1_MouseUp);
             // 
             // Form1
             // 
